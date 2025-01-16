@@ -1,9 +1,42 @@
-import React from "react";
-import { useOrderHistory } from "../context/OrderHistoryContext"; 
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 
+interface Product {
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    category: string;
+    image: string;
+    quantity: number;
+  }
+  
+  interface Order {
+    id: number;
+    date: string;
+    products: Product[];
+  }
+
 const OrderHistoryPage: React.FC = () => {
-  const { orders } = useOrderHistory();
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/orders", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setOrders(response.data);
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   return (
     <div className="p-4">
@@ -17,7 +50,7 @@ const OrderHistoryPage: React.FC = () => {
               {orders.map((order) => (
                 <li key={order.id} className="mb-6 p-4 border rounded-lg shadow-lg">
                   <h2 className="text-xl font-semibold">Order #{order.id}</h2>
-                  <p className="text-sm text-gray-500">Date: {order.date}</p>
+                  <p className="text-sm text-gray-500">Date: {new Date(order.date).toLocaleDateString()}</p>
                   <div className="mt-2">
                     <h3 className="text-lg font-semibold">Products:</h3>
                     <ul className="list-disc pl-6">

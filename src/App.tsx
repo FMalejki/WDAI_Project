@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext"; // Importujemy AuthProvider
@@ -12,13 +12,13 @@ import { CartProvider } from "./context/CartContext";
 import { OrderHistoryProvider } from "./context/OrderHistoryContext";
 import Header from "./components/Header";
 
-
 const App: React.FC = () => {
   return (
-    <AuthProvider>
+    
+      <Router>
+        <AuthProvider>
       <CartProvider>
         <OrderHistoryProvider>
-      <Router>
       <Header />
         <Routes>
           <Route path="/login" element={<LoginRegisterPage />} />
@@ -39,10 +39,10 @@ const App: React.FC = () => {
           <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>}/>
           <Route path="/orders" element={<ProtectedRoute><OrderHistoryPage /></ProtectedRoute>} />
         </Routes>
-      </Router>
-      </OrderHistoryProvider>
+        </OrderHistoryProvider>
       </CartProvider>
     </AuthProvider>
+      </Router>
   );
 };
 

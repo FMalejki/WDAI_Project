@@ -3,13 +3,14 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const LoginRegisterPage: React.FC = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -18,26 +19,29 @@ const LoginRegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); // Resetowanie błędu przed każdym wysłaniem formularza.
+
     if (isRegister) {
+      // Walidacja haseł
       if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match!");
+        setError("Passwords do not match!");
         return;
       }
+
       try {
-        //tu bylo z responsem przed usuniecie response = 
-        await axios.post("http://localhost:5000/register", {
+        const response = await axios.post("http://localhost:5000/register", {
           username: formData.username,
           password: formData.password,
         });
+
         alert("Registration successful!");
         setIsRegister(false);
+        navigate("/login"); // Po rejestracji przekieruj do strony logowania
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          alert("Registration failed: " + (error.response?.data?.message || error.message));
-        } else if (error instanceof Error) {
-          alert("An unexpected error occurred: " + error.message);
+          setError(error.response?.data?.message || "Registration failed");
         } else {
-          alert("An unknown error occurred.");
+          setError("An unexpected error occurred.");
         }
       }
     } else {
@@ -48,14 +52,12 @@ const LoginRegisterPage: React.FC = () => {
         });
         alert("Login successful!");
         localStorage.setItem("token", response.data.token);
-        navigate("/");
+        navigate("/"); // Po logowaniu przekieruj na stronę główną
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          alert("Registration failed: " + (error.response?.data?.message || error.message));
-        } else if (error instanceof Error) {
-          alert("An unexpected error occurred: " + error.message);
+          setError(error.response?.data?.message || "Login failed");
         } else {
-          alert("An unknown error occurred.");
+          setError("An unexpected error occurred.");
         }
       }
     }
@@ -67,6 +69,7 @@ const LoginRegisterPage: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           {isRegister ? "Register" : "Login"}
         </h1>
+        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-600">

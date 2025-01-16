@@ -20,6 +20,9 @@ const HomePage: React.FC = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get<Product[]>("https://fakestoreapi.com/products");
+        response.data = response.data.filter((item) => {
+          return !(item.title && item.title.includes("-"));
+        });
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

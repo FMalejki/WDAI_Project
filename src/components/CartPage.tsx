@@ -1,31 +1,44 @@
 import React from "react";
 import { useCart } from "../context/CartContext";
-import { useOrderHistory } from "../context/OrderHistoryContext";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const CartPage: React.FC = () => {
   const { cart, removeFromCart, updateQuantity } = useCart();
-  const { addOrder } = useOrderHistory();
 
 
-  const handleQuantityChange = (id: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQuantityChange = (title: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = parseInt(event.target.value);
-    if (newQuantity > 0) {
-      updateQuantity(id, newQuantity);
+    if (!isNaN(newQuantity)) {
+      updateQuantity(title, newQuantity);
     }
   };
+  
 
   const totalPrice = cart.reduce((acc, product) => acc + product.price * product.quantity, 0);
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     const newOrder = {
-      id: new Date().getTime(),
-      date: new Date().toLocaleDateString(),
-      products: cart,
+      date: new Date().toISOString(),
+      products: cart, // Przekazujemy produkty z koszyka
     };
-    addOrder(newOrder);
-    cart.forEach((product) => removeFromCart(product.id));
+  
+    try {
+      await axios.post("http://localhost:5000/orders", newOrder, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
+      // Po udanym złożeniu zamówienia usuń produkty z koszyka
+      cart.forEach((product) => removeFromCart(product.title));
+      alert("Order placed successfully!");
+    } catch (error) {
+      console.error("Failed to place order:", error);
+      alert("Failed to place order. Please try again.");
+    }
   };
+  
 
   return (
     <div className="p-4">
@@ -44,12 +57,12 @@ const CartPage: React.FC = () => {
                       type="number"
                       value={product.quantity}
                       min="1"
-                      onChange={(e) => handleQuantityChange(product.id, e)}
+                      onChange={(e) => handleQuantityChange(product.title, e)}
                       className="w-16 p-1 border"
                     />
                     <span>${(product.price * product.quantity).toFixed(2)}</span>
                     <button
-                      onClick={() => removeFromCart(product.id)}
+                      onClick={() => removeFromCart(product.title)}
                       className="bg-red-500 text-white px-2 py-1 rounded"
                     >
                       Remove
