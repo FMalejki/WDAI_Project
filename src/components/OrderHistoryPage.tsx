@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface Product {
     id: number;
@@ -20,6 +21,15 @@ interface Product {
 
 const OrderHistoryPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     const fetchOrders = async () => {
