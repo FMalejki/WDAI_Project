@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import axios from 'axios'; // Będziemy używać axios do komunikacji z backendem
-import { useNavigate } from 'react-router-dom'; // Aby nawigować po logowaniu
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  user: any; // Możesz określić dokładny typ na podstawie struktury użytkownika
+  user: any;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,29 +14,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
-  const [user, setUser] = useState<any>(null); // Przechowujemy dane użytkownika
+  const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
 
 
-  // Funkcja do logowania
   const login = async (email: string, password: string) => {
     try {
-      // Wysyłamy dane logowania do serwera
       const response = await axios.post('http://localhost:5000/login', { email, password });
       const { token } = response.data;
 
       if (token) {
-        // Zapisujemy token w localStorage
         localStorage.setItem('token', token);
 
-        // Pobieramy dane użytkownika, jeżeli chcesz je przechować
         const userResponse = await axios.get('http://localhost:5000/user', {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        setUser(userResponse.data); // Zapisujemy dane użytkownika
-        setIsAuthenticated(true); // Użytkownik jest zalogowany
-        navigate('/'); // Przekierowanie na stronę główną po udanym logowaniu
+        setUser(userResponse.data);
+        setIsAuthenticated(true);
+        navigate('/');
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -44,12 +40,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Funkcja do wylogowania
   const logout = () => {
-    localStorage.removeItem('token'); // Usuwamy token z localStorage
-    setIsAuthenticated(false); // Ustawiamy status na niezalogowanego
-    setUser(null); // Usuwamy dane użytkownika
-    navigate('/login'); // Przekierowanie na stronę logowania
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUser(null);
+    navigate('/login');
   };
 
   return (
@@ -59,7 +54,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-// Custom hook do używania kontekstu
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

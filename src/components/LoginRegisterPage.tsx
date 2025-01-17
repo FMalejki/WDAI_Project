@@ -19,10 +19,9 @@ const LoginRegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Resetowanie błędu przed każdym wysłaniem formularza.
+    setError(null);
 
     if (isRegister) {
-      // Walidacja haseł
       if (formData.password !== formData.confirmPassword) {
         setError("Passwords do not match!");
         return;
@@ -36,7 +35,7 @@ const LoginRegisterPage: React.FC = () => {
 
         alert("Registration successful!");
         setIsRegister(false);
-        navigate("/login"); // Po rejestracji przekieruj do strony logowania
+        navigate("/login");
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(error.response?.data?.message || "Registration failed");
@@ -52,7 +51,7 @@ const LoginRegisterPage: React.FC = () => {
         });
         alert("Login successful!");
         localStorage.setItem("token", response.data.token);
-        navigate("/"); // Po logowaniu przekieruj na stronę główną
+        navigate("/");
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(error.response?.data?.message || "Login failed");

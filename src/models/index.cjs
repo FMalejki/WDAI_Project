@@ -5,7 +5,6 @@ const Order = require('./order.cjs');
 const Review = require('./review.cjs');
 const Cart = require('./cart.cjs')
 
-// Relacje
 Product.hasMany(Review, { as: 'reviews', foreignKey: 'productId' });
 User.hasMany(Review, { as: 'reviews', foreignKey: 'userId' });
 

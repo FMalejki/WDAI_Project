@@ -20,7 +20,7 @@ const CartPage: React.FC = () => {
   const placeOrder = async () => {
     const newOrder = {
       date: new Date().toISOString(),
-      products: cart, // Przekazujemy produkty z koszyka
+      products: cart,
     };
   
     try {
@@ -30,7 +30,6 @@ const CartPage: React.FC = () => {
         },
       });
   
-      // Po udanym złożeniu zamówienia usuń produkty z koszyka
       cart.forEach((product) => removeFromCart(product.title));
       alert("Order placed successfully!");
     } catch (error) {

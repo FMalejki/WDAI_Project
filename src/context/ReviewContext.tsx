@@ -47,7 +47,7 @@ export const ReviewProvider: React.FC<ReviewProviderProps> = ({ children }) => {
     try {
       const response = await axios.get("http://localhost:5000/reviews", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Zakładając, że używasz tokenów
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       setReviews(response.data);
